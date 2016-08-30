@@ -1,10 +1,16 @@
 #!/usr/bin/env python
 #-*-coding:utf-8-*-
 
+# 5 algoritmos
+# FCFS/FIFO
+# SJF No expulsivo
+# SJF Expulsivo
+# Round Robin
+# No expulsivo por prioridades
 """
 Podría usar zip...
 http://www.forosdelweb.com/f130/faqs-python-591053/#post3003469
-Generando por separado listas de cada "elemento" necesario. i.e. Una lista ordinal para identificar al proceso, 
+Generando por separado listas de cada "elemento" necesario. i.e. Una lista ordinal para identificar al proceso,
 una lista con los tiempos de llegada, una lista con los tiempos de ráfaga, y una lista para las prioridades.
 """
 
@@ -21,7 +27,6 @@ random.seed()
 
 def main():
 	cantidad_de_procesos = random.randint(1, 50)
-	
 	# Inicializar la lista de procesos
 	procesos = []
 	for x in range(cantidad_de_procesos):
@@ -38,7 +43,7 @@ def main():
 	for x in procesos:
 		print x
 	print "\n",nuevos_tiempos_de_llegada[:cantidad_de_procesos]
-	 
+
 #export PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games'
 
 if __name__ == '__main__':
