@@ -27,15 +27,15 @@ random.seed()
 
 def main():
 	global procesos
-        cantidad_de_procesos = random.randint(1, 50)
+        cantidad_de_procesos = random.randint(1, 35)
 	# Inicializar la lista de procesos
 	for x in range(cantidad_de_procesos):
 		# [numero proceso , tiempo llegada , rafaga de cpu , prioridad ]
-		procesos.append([x, 0, random.randint(2,100), random.randint(0,10)])
+		procesos.append([x, 0, random.randint(2,50), random.randint(0,10)])
 	# Meterle los tiempos de llegada sin que se repitan
 	# Compresión de listas | Ver detalles al final del documento
 	#nuevos_tiempos_de_llegada = [ d.setdefault(x,x) for x in [random.randint(0,200) for x in range(cantidad_de_procesos ** 2)] if x not in d ]
-	nuevos_tiempos_de_llegada = [d.setdefault(x,x) for d in [{}] for x in [random.randint(0,200) for y in range(cantidad_de_procesos ** 2)] if x not in d]
+	nuevos_tiempos_de_llegada = [d.setdefault(x,x) for d in [{}] for x in [random.randint(0,100) for y in range(cantidad_de_procesos ** 3)] if x not in d]
 	#[ d.setdefault(x,x) for d in [{}] for x in startList if x not in d ]
 	# Inserta los nuevos tiempos.
 	for x in range(cantidad_de_procesos):
@@ -53,17 +53,35 @@ def main():
 
 def algoritmo_fifo(respuesta):
     global procesos
+    respuesta = respuesta
     numero_procesos_llegada = []
     procesos_ordenados_x_llegada = {}
     procesos_ordenados_x_llegada2 = []
+    lista_nueva = []
     for each_process in procesos:
         numero_procesos_llegada.append(each_process[1])
         procesos_ordenados_x_llegada[each_process[1]] = each_process
     numero_procesos_llegada.sort()
     for x in numero_procesos_llegada:
         procesos_ordenados_x_llegada2.append(procesos_ordenados_x_llegada[x])  # Añade las claves de diccionario en una lista vacía, siguiendo el orden de la lista de los tiempos de llegada(De manera ascendendete)
+        lista_nueva.append(procesos_ordenados_x_llegada[x][:])
     if respuesta:
         acomodo(procesos_ordenados_x_llegada2)  # Si la respuesta es verdadera llama a la función que se encarga de mostrar en pantalla de manera ordenada.
+        print "\nNP\tLL\tRC\tP!\tTRet\tTEsp"
+    lista_nueva = lista_nueva[:]
+    acumulador_tiempo_ret = lista_nueva[0][1]
+    acumulador_tiempo_esp = lista_nueva[0][1]
+    for x in range(len(lista_nueva)):
+        acumulador_tiempo_ret += lista_nueva[x][2]
+        lista_nueva[x].append(acumulador_tiempo_ret)
+        if acumulador_tiempo_esp - lista_nueva[x][1] <= 0:
+            acumulador_tiempo_esp = 0
+        else:
+            acumulador_tiempo_esp -= lista_nueva[x][1]
+        lista_nueva[x].append(acumulador_tiempo_esp)
+        acumulador_tiempo_esp = acumulador_tiempo_ret
+    for u,v,w,x,y,z in lista_nueva:
+        print u,"\t",v,"\t",w,"\t",x,"\t",y,"\t",z
     return procesos_ordenados_x_llegada2
 
 #export PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games'
