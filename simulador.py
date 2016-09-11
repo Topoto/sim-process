@@ -40,57 +40,73 @@ def main():
 	# Inserta los nuevos tiempos.
 	for x in range(cantidad_de_procesos):
 		procesos[x][1] = nuevos_tiempos_de_llegada[x]
-	for x in procesos:
-		print x
+        acomodo(procesos)
 	#print "\n",nuevos_tiempos_de_llegada[:cantidad_de_procesos]
-        r = raw_input("¿Desea aplicar el algoritmo FIFO(FCFS)?")
-        if "y" in r.lower() or "s" in r.lower():
-            algoritmo_fifo(True)  # Envía True para que la función se encargue de mostrar en pantalla los procesos ordenados por tiempo de llegada..
+        respuesta = raw_input("¿Desea aplicar el algoritmo FIFO(FCFS)?")
+        if "y" in respuesta.lower() or "s" in respuesta.lower():
+            procesos_ordenados_x_llegada = algoritmo_fifo(True)  # Envía True para que la función se encargue de mostrar en pantalla los procesos ordenados por tiempo de llegada..
         else:
             procesos_ordenados_x_llegada = algoritmo_fifo(False)  # Envía False para que la función no muestre en pantalla los procesos ordenados por tiempo de llegada, en cambio, sólo los almacena en la variable, para usarlos en otra función más adelante.
-        r = raw_input("¿Desea aplicar el algoritmo SFJ[No expulsivo]?")
-        if "y" in r.lower() or "s" in r.lower():
+        respuesta = raw_input("¿Desea aplicar el algoritmo SFJ[No expulsivo]?")
+        if "y" in respuesta.lower() or "s" in respuesta.lower():
             algoritmo_sjf(procesos_ordenados_x_llegada)  # Envía la lista de procesos, ordenados por tiempo de llegada.
 
-def algoritmo_fifo(r):
+def algoritmo_fifo(respuesta):
     global procesos
     numero_procesos_llegada = []
     procesos_ordenados_x_llegada = {}
+    procesos_ordenados_x_llegada2 = []
     for each_process in procesos:
         numero_procesos_llegada.append(each_process[1])
         procesos_ordenados_x_llegada[each_process[1]] = each_process
     numero_procesos_llegada.sort()
-    if r:
-        for x in numero_procesos_llegada:
-            print procesos_ordenados_x_llegada[x]
-    return procesos_ordenados_x_llegada
+    for x in numero_procesos_llegada:
+        procesos_ordenados_x_llegada2.append(procesos_ordenados_x_llegada[x])  # Añade las claves de diccionario en una lista vacía, siguiendo el orden de la lista de los tiempos de llegada(De manera ascendendete)
+    if respuesta:
+        acomodo(procesos_ordenados_x_llegada2)  # Si la respuesta es verdadera llama a la función que se encarga de mostrar en pantalla de manera ordenada.
+    return procesos_ordenados_x_llegada2
 
 #export PATH='/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games'
-
-def algoritmo_sjf(w,y):
-    #global procesos
-    #np = []
-    #jp = {}
-    jp = w
-    np = y
-
-    for each_process in procesos[1:]:
-        np.append(each_process[2])
-        jp[each_process[2]] = each_process
-    np.sort()
-    np.insert(0,procesos[0][2])
-    jp[procesos[0][2]] = procesos[0]
-    print np
-    for x in np:
-        print jp[x]
-# Hasta aquí imprime claves duplicadas, debido a que las ráfagas de cpu sí se pueden repetir. Necesariob corregir.
+incremental = 0.999
+def algoritmo_sjf(procesos_ordenados_x_llegada):
+    procesos_ordenados_x_llegada = procesos_ordenados_x_llegada
+    procesos_ordenados_x_tiempo_de_rafaga = {}
+    lista_poxtr = []  # Lista con los tiempos de ráfaga. (poxtr = Procesos ordenados x tiempo de ráfaga)
+#    incremental = 0.999
+#    for each_process in procesos_ordenados_x_llegada[1:]:
+    def function(each_process):
+        global incremental
+        if each_process[2] not in procesos_ordenados_x_tiempo_de_rafaga:
+            lista_poxtr.append(each_process[2])
+            procesos_ordenados_x_tiempo_de_rafaga[each_process[2]] = each_process
+            #incremental += 0.1
+        else:
+            lista_poxtr.append(each_process[2]+ incremental)
+            procesos_ordenados_x_tiempo_de_rafaga[each_process[2] + incremental] = each_process
+            incremental -= 0.001
+    for each_process in procesos_ordenados_x_llegada[1:]:
+        function(each_process)
+    lista_poxtr.sort()
+    lista_poxtr.insert(0,procesos_ordenados_x_llegada[0][2])
+    function(procesos_ordenados_x_llegada[0])
+    lista_poxtr.pop()
+    procesos_ordenados_x_tiempo_de_rafaga2 = []
+    for x in lista_poxtr:
+        procesos_ordenados_x_tiempo_de_rafaga2.append(procesos_ordenados_x_tiempo_de_rafaga[x])
+    acomodo(procesos_ordenados_x_tiempo_de_rafaga2)
+    """for x in lista_poxtr:
+        print x," ",procesos_ordenados_x_tiempo_de_rafaga[x]"""
     """np.sort()
     np.insert(0,procesos[0][2])
     print np
     for x in range(len(procesos)):
         for u in np:
             print procesos[x].index(u)"""
-
+def acomodo(lista_procesos):
+    # Pequeña función que se encarga de mostrar en pantalla las listas que se pasen como parámetro, añadiendo una tabulaciones para una buena presentación.
+    print "NP\tLL\tRC\tP!"
+    for w,x,y,z in lista_procesos:
+        print w,"\t",x,"\t",y,"\t",z
 
 if __name__ == '__main__':
 	main()
